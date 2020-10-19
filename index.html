@@ -1,0 +1,50 @@
+<html>
+<head>
+</head>
+<body>
+<div id="hypertaptest"></div>
+<br />
+Measure tapping over <input id="duration" type="number" min="0" value="1000" /> ms
+<script>
+((w, d) => {
+  const $status = d.getElementById('hypertaptest')
+  const $dur = d.getElementById('duration')
+
+  let ready = false
+  let timeout = null
+  let readykey = 'a'
+  let tapkey = null
+  let taps = 0
+  let dur = 0
+
+  $status.innerText = `ready up with ${readykey}, then start tapping any key!`
+  w.addEventListener('keyup', (e) => {
+    if (!ready) {
+      if (e.key === readykey) {
+        ready = true
+        $status.innerText = 'ready! start tapping!'
+      }
+      return
+    }
+  
+    if (timeout === null) {
+      tapkey = e.key
+      readykey = tapkey === 'a' ? 's' : 'a'
+      $status.innerText = `tap more on ${tapkey}!`
+      dur = parseInt($dur.value, 10)
+      taps = 0
+      timeout = w.setTimeout(() => {
+        const perSec = taps * 1000 / dur
+        ready = false
+        $status.innerText = `tapped ${perSec}x per second (${taps}/${dur}ms) !!! (ready up again with ${readykey})`
+        timeout = null
+        tapkey = null
+      }, dur)
+    } else if (tapkey === e.key) {
+      taps++
+    }
+  })
+})(window, document)
+</script>
+</body>
+</html>
